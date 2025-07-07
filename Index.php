@@ -14,39 +14,61 @@ $diceSet = [
     'd100' => new Dice(100),
 ];
 
+function parseCommands(string $input): array {
+    preg_match_all('/(\d*)d(\d+)/i', $input, $matches, PREG_SET_ORDER);
+    $commands = [];
+
+    foreach ($matches as $m) {
+        $qty = $m [1] == '' ? 1 :intval($m[1]);
+        $sides = intval($m [2]);
+        $commands[] = ['qty' => $qty, 'faces' => $sides];
+
+    }
+
+    return $commands;
+
+}
+
 while (true) {
     echo "\n====Rolagem Dados====\n";
-    echo "Escolha um dado ou digite sair\n";
+    echo "Digite comandos como: 2d20+2 ou sair)\n";
+    $entry = trim(fgets(STDIN));
 
-    foreach ($diceSet as $label => $dice){
-        echo  "- $label\n";
+    $cmds = parseCommands($entry);
+    if (empty($cmds)) {
+        echo "Nenhum comando valido encontrado. Use o Formado (Quantidade de rolagens)D(Quantidade de lados) \n";
+        continue;
+
+    } 
+    
+    foreach ($cmds as $cmd) {
+        $qty = $cmd['qty'];
+        $faces = $cmd ['faces'];
+
+    if (!isset($diceSet["d$faces"])) {
+        echo "dado d{$faces} não disponivel. \n";
+        continue;
+    }
+
+    $dice = $diceSet["d$faces"];
+    $rolls = [];
+
+    for ($i=0; $i < $qty; $i++) {
+        $rolls[] = $dice->roll();
+
+    }
+
+    $sum = array_sum($rolls);
+
+    $rollsList = implode(', ', $rolls);
+    echo "rolando {$qty}d{$faces}: [{$rollsList}] => total: {$sum}\n";
+
     }
 
     echo "> ";
-    $entrada = trim(fgets(STDIN));
 
-    if ($entrada === 'sair') {
+    if (strtolower($entry) === 'sair') {
         echo "Saindo...";
         break;
     }
-
-    if (array_key_exists($entrada, $diceSet)){
-        $resultado = $diceSet[$entrada]->roll();
-        echo "Você rolou um $entrada e tirou: $resultado\n";
-
-    } else {
-        echo "Dado Invalido. tente novamente.\n";
-    }
 }
-
-
-$atributes = [
-    'Strength' => 0,
-    'Dexterity'=> 0,
-    'Constituition' => 0,
-    'Inteligence' => 0,
-    'Winsdon' => 0,
-    'Charisma' => 0
-];
-
-var_dump($atributes);
