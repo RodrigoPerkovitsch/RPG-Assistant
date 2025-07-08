@@ -1,2 +1,2 @@
 # RPG-Assistant
-This system is be thinking to bem a generalist RPG Assistant
+this system is being thought of as an RPG assistant
